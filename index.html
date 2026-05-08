@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Life OS Clock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Jost:wght@200;300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --coral:   #E8856A;
+      --blush:   #F2B5C0;
+      --peach:   #F5CAAC;
+      --lavender:#C9B8E8;
+      --sky:     #A8D4E6;
+      --mint:    #A8DDD4;
+      --lemon:   #F5E6A8;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    .widget {
+      position: relative;
+      width: 180px;
+      padding: 44px 16px 38px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ── 5 brushes, each a totally unique trajectory ── */
+    .brush { position: absolute; border-radius: 50%; pointer-events: none; }
+
+    /* brush 1 — top-left, fat diagonal, blush→peach, slow squash */
+    @keyframes b1 {
+      0%   { transform: rotate(-22deg) scale(1.00,1.00);  opacity:.52; filter:blur(22px); }
+      35%  { transform: rotate(-14deg) scale(1.28,0.72);  opacity:.64; filter:blur(17px); }
+      70%  { transform: rotate(-28deg) scale(0.88,1.18);  opacity:.44; filter:blur(27px); }
+      100% { transform: rotate(-22deg) scale(1.00,1.00);  opacity:.52; filter:blur(22px); }
+    }
+    .b1 {
+      width:185px; height:62px;
+      background: linear-gradient(110deg, var(--blush), var(--peach));
+      top:-14px; left:-48px;
+      animation: b1 8.2s ease-in-out infinite 0s;
+    }
+
+    /* brush 2 — top-right, skinny, steep, lavender→sky */
+    @keyframes b2 {
+      0%   { transform: rotate(38deg)  scale(1.00,1.00);  opacity:.42; filter:blur(20px); }
+      40%  { transform: rotate(26deg)  scale(0.76,1.38);  opacity:.57; filter:blur(14px); }
+      75%  { transform: rotate(46deg)  scale(1.24,0.78);  opacity:.34; filter:blur(29px); }
+      100% { transform: rotate(38deg)  scale(1.00,1.00);  opacity:.42; filter:blur(20px); }
+    }
+    .b2 {
+      width:135px; height:43px;
+      background: linear-gradient(80deg, var(--lavender), var(--sky));
+      top:-4px; right:-40px;
+      animation: b2 10.7s ease-in-out infinite -3.1s;
+    }
+
+    /* brush 3 — middle, near-horizontal, mint→lemon, drifts sideways */
+    @keyframes b3 {
+      0%   { transform: rotate(5deg)  scale(1.00,1.00) translateX(0px);   opacity:.40; filter:blur(24px); }
+      30%  { transform: rotate(-4deg) scale(1.32,0.74) translateX(-9px);  opacity:.55; filter:blur(17px); }
+      65%  { transform: rotate(12deg) scale(0.80,1.30) translateX(7px);   opacity:.33; filter:blur(31px); }
+      100% { transform: rotate(5deg)  scale(1.00,1.00) translateX(0px);   opacity:.40; filter:blur(24px); }
+    }
+    .b3 {
+      width:200px; height:52px;
+      background: linear-gradient(95deg, var(--mint), var(--lemon));
+      top:42%; left:-52px;
+      animation: b3 9.4s ease-in-out infinite -5.8s;
+    }
+
+    /* brush 4 — bottom-left, chunky, peach→blush */
+    @keyframes b4 {
+      0%   { transform: rotate(16deg)  scale(1.00,1.00);  opacity:.48; filter:blur(22px); }
+      45%  { transform: rotate(7deg)   scale(1.26,0.76);  opacity:.61; filter:blur(15px); }
+      80%  { transform: rotate(23deg)  scale(0.82,1.22);  opacity:.38; filter:blur(28px); }
+      100% { transform: rotate(16deg)  scale(1.00,1.00);  opacity:.48; filter:blur(22px); }
+    }
+    .b4 {
+      width:178px; height:60px;
+      background: linear-gradient(120deg, var(--peach), var(--blush));
+      bottom:-12px; left:-44px;
+      animation: b4 7.6s ease-in-out infinite -2.3s;
+    }
+
+    /* brush 5 — bottom-right, steep negative, sky→lavender */
+    @keyframes b5 {
+      0%   { transform: rotate(-32deg) scale(1.00,1.00);  opacity:.44; filter:blur(20px); }
+      55%  { transform: rotate(-19deg) scale(0.78,1.34);  opacity:.59; filter:blur(14px); }
+      85%  { transform: rotate(-40deg) scale(1.22,0.80);  opacity:.35; filter:blur(27px); }
+      100% { transform: rotate(-32deg) scale(1.00,1.00);  opacity:.44; filter:blur(20px); }
+    }
+    .b5 {
+      width:148px; height:48px;
+      background: linear-gradient(70deg, var(--sky), var(--lavender));
+      bottom:-6px; right:-36px;
+      animation: b5 11.1s ease-in-out infinite -7.4s;
+    }
+
+    /* ── time block ── */
+    .time-block {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* hours row: big number + AM/PM superscript top-right */
+    .time-row {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .time-main {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 72px;
+      line-height: 0.88;
+      color: var(--coral);
+      letter-spacing: -2px;
+    }
+
+    .time-ampm {
+      font-family: 'Jost', sans-serif;
+      font-weight: 200;
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--coral);
+      opacity: .62;
+      text-transform: uppercase;
+      margin-top: 7px;
+      margin-left: 3px;
+    }
+
+    /* divider */
+    .divider {
+      position: relative;
+      z-index: 1;
+      width: 70px; height: 1px;
+      border-radius: 2px;
+      background: linear-gradient(90deg,
+        transparent,
+        var(--blush) 20%,
+        var(--lavender) 50%,
+        var(--mint) 80%,
+        transparent);
+      margin: 6px 0 5px;
+    }
+
+    .date-day {
+      position: relative; z-index: 1;
+      font-family: 'Jost', sans-serif;
+      font-weight: 200; font-size: 8px;
+      letter-spacing: 5px; color: var(--coral);
+      opacity: .55; text-transform: uppercase;
+    }
+    .date-month {
+      position: relative; z-index: 1;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 300;
+      font-size: 17px; color: var(--coral);
+      opacity: .82; letter-spacing: 0.5px;
+      margin-top: 1px;
+    }
+    .date-num {
+      position: relative; z-index: 1;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-size: 40px;
+      line-height: 1; color: var(--coral);
+      opacity: .88; letter-spacing: -1px;
+    }
+    .date-year {
+      position: relative; z-index: 1;
+      font-family: 'Jost', sans-serif;
+      font-weight: 200; font-size: 8px;
+      letter-spacing: 4px; color: var(--coral);
+      opacity: .45; margin-top: 1px;
+    }
+
+    @keyframes softpulse {
+      0%,100% { text-shadow: 0 0 16px rgba(232,133,106,0.12); }
+      50%      { text-shadow: 0 0 28px rgba(232,133,106,0.26); }
+    }
+    .time-main { animation: softpulse 4s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+<div class="widget">
+  <div class="brush b1"></div>
+  <div class="brush b2"></div>
+  <div class="brush b3"></div>
+  <div class="brush b4"></div>
+  <div class="brush b5"></div>
+
+  <div class="time-block">
+    <div class="time-row">
+      <span class="time-main" id="hours">00</span>
+      <span class="time-ampm" id="ampm">AM</span>
+    </div>
+    <span class="time-main" id="mins">00</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="date-day"   id="dayname">MONDAY</div>
+  <div class="date-month" id="monthname">January</div>
+  <div class="date-num"   id="daynum">1</div>
+  <div class="date-year"  id="yearnum">2025</div>
+</div>
+
+<script>
+  const MONTHS = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function tick(){
+    const now = new Date();
+    let h = now.getHours();
+    const m = now.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('hours').textContent     = pad(h);
+    document.getElementById('mins').textContent      = pad(m);
+    document.getElementById('ampm').textContent      = ampm;
+    document.getElementById('dayname').textContent   = DAYS[now.getDay()];
+    document.getElementById('monthname').textContent = MONTHS[now.getMonth()];
+    document.getElementById('daynum').textContent    = now.getDate();
+    document.getElementById('yearnum').textContent   = now.getFullYear();
+  }
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>
