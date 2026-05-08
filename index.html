@@ -62,7 +62,7 @@
     .b2 {
       width:135px; height:43px;
       background: linear-gradient(80deg, var(--lavender), var(--sky));
-      top:-4px; right:-40px;
+      top:40px; right:-40px;
       animation: b2 10.7s ease-in-out infinite -3.1s;
     }
 
@@ -90,7 +90,7 @@
     .b4 {
       width:178px; height:60px;
       background: linear-gradient(120deg, var(--peach), var(--blush));
-      bottom:-12px; left:-44px;
+      bottom:40px; left:-44px;
       animation: b4 7.6s ease-in-out infinite -2.3s;
     }
 
@@ -117,12 +117,6 @@
       align-items: center;
     }
 
-    /* hours row: big number + AM/PM superscript top-right */
-    .time-row {
-      display: flex;
-      align-items: flex-start;
-    }
-
     .time-main {
       font-family: 'Cormorant Garamond', serif;
       font-weight: 300;
@@ -130,6 +124,9 @@
       line-height: 0.88;
       color: var(--coral);
       letter-spacing: -2px;
+      display: block;
+      text-align: center;
+      width: 100%;
     }
 
     .time-ampm {
@@ -140,11 +137,11 @@
       color: var(--coral);
       opacity: .62;
       text-transform: uppercase;
-      margin-top: 7px;
-      margin-left: 3px;
+      text-align: center;
+      margin-top: 12px;
     }
 
-    /* divider */
+    /* divider — sits below ampm */
     .divider {
       position: relative;
       z-index: 1;
@@ -156,15 +153,15 @@
         var(--lavender) 50%,
         var(--mint) 80%,
         transparent);
-      margin: 6px 0 5px;
+      margin: 8px 0 7px;
     }
 
     .date-day {
       position: relative; z-index: 1;
       font-family: 'Jost', sans-serif;
-      font-weight: 200; font-size: 8px;
+      font-weight: 400; font-size: 8px;
       letter-spacing: 5px; color: var(--coral);
-      opacity: .55; text-transform: uppercase;
+      opacity: .70; text-transform: uppercase;
     }
     .date-month {
       position: relative; z-index: 1;
@@ -184,9 +181,9 @@
     .date-year {
       position: relative; z-index: 1;
       font-family: 'Jost', sans-serif;
-      font-weight: 200; font-size: 8px;
+      font-weight: 400; font-size: 8px;
       letter-spacing: 4px; color: var(--coral);
-      opacity: .45; margin-top: 1px;
+      opacity: .65; margin-top: 1px;
     }
 
     @keyframes softpulse {
@@ -205,11 +202,9 @@
   <div class="brush b5"></div>
 
   <div class="time-block">
-    <div class="time-row">
-      <span class="time-main" id="hours">00</span>
-      <span class="time-ampm" id="ampm">AM</span>
-    </div>
+    <span class="time-main" id="hours">00</span>
     <span class="time-main" id="mins">00</span>
+    <span class="time-ampm" id="ampm">AM</span>
   </div>
 
   <div class="divider"></div>
